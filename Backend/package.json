@@ -1,0 +1,24 @@
+{
+    "name": "authx-backend",
+    "version": "1.0.0",
+    "description": "AuthX backend",
+    "main": "server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/harivarshan-nitt/AuthX/Backend"
+    },
+    "keywords": [
+        "oauth2.0"
+    ],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.0.3",
+        "express": "^4.18.2",
+        "mongoose": "^7.0.3"
+    }
+}
