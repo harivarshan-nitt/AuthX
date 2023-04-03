@@ -22,7 +22,8 @@ const clientAppSchema = new mongoose.Schema({
         required: true,
     },
     scopes: {
-        type: Array,
+        type: String,
+        enum: ["NAME","EMAIL"],
         required: true,
     },
 }, { timestamps: true });
