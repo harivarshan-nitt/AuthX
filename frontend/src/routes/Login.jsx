@@ -1,0 +1,58 @@
+import Container from "../components/Container"
+import Box from '../components/Box';
+import '../styles/Styles.css';
+import "../themes/main_theme"
+import Cookies from "universal-cookie"
+import { useNavigate, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import Form from "../components/Forms";
+import {cool_50} from "../themes/main_theme"
+
+const Register = ()=>{
+
+    const cookies = new Cookies()
+    const navigate = useNavigate()
+    const jwt = cookies.get("jwt")
+
+    const handleLogin = async (formData)=>{
+        console.log(formData);
+        const req = {
+            method: 'POST',
+            headers: {'content-type': 'application/json'},
+            body: JSON.stringify(formData),
+        };
+        const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/auth/login`, req);
+        const response = await res.json();
+
+        cookies.set("jwt", response.token)
+
+        window.location.replace(response.redirect)
+
+        return null
+    }
+
+    useEffect(()=>{
+        if(jwt) navigate("/")
+    }, [jwt, navigate])
+
+    const fields = [
+        { name: 'email', label: 'Email', type: 'email',  placeholder: "email..." },
+        { name: 'password', label: 'Password', type: 'password',  placeholder: "password..."},
+    ]
+
+    return (
+        <Container center>
+            <Box width="600px">
+                <Form fields={fields} onSubmit={(formData)=>handleLogin(formData)}/>
+                <div style={{
+                    marginTop: "50px",
+                    marginBottom: "30px",
+                    width: "100%",
+                    textAlign: "center",
+                }}><a href="/register" style={{color: cool_50}}>Register Instead</a></div>
+            </Box>
+        </Container>
+    )
+}
+
+export default Register
