@@ -4,12 +4,18 @@ const ClientApp = require("../../models/schema/clientApp");
 
 ClientAppRouter.post("/register", async (req, res) => {
   try {
-    let  {name , description , redirectUri} = req.body;
-    // yet to add scopes 
+    let  {name , description , redirectUri ,scopes} = req.body;
+
     if (!(typeof name === "string") || 
     !(typeof description === "string") ||
-    !(typeof redirectUri === "string")
+    !(typeof redirectUri === "string") ||
+    !Array.isArray(scopes)
     ) return res.status(400).json({ message: "NOT IN REQUIRED FORMAT" });
+
+    for (let index = 0; index < scopes.length; index++) {
+      const element = scopes[index];
+      if(["NAME","EMAIL"].includes(element) == false) return res.status(400).json({ message: "INVALID SCOPES" });    
+    }
 
     let clientApp = await ClientApp.findOne({
       name : name
@@ -23,7 +29,7 @@ ClientAppRouter.post("/register", async (req, res) => {
        redirectUri :  redirectUri,
        clientAppId : crypto.randomBytes(10).toString("hex"),
        clientAppSecret : crypto.randomBytes(20).toString("hex"),
-       scopes : []
+       scopes : scopes
     });
 
     return res.status(200).json({ message: "SUCCESS", cred : newClientApp });
@@ -87,7 +93,7 @@ ClientAppRouter.put("/", async (req, res) => {
   }
 });
 
-ClientAppRouter.delete("/", async (req, res) => {
+ClientAppRouter.post("/delete", async (req, res) => {
   try {
     let  {clientAppId, clientAppSecret} = req.body;
     if (!(typeof clientAppId === "string") || 
