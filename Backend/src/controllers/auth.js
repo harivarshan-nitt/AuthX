@@ -20,7 +20,7 @@ auth.post("/login", async (req, res)=>{
         })
         if(userExists == null)
             res.end({
-                status: 406,
+                status: 401,
                 response: "Email does not exist"
             })   
         else{
