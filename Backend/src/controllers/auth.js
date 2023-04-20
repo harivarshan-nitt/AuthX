@@ -5,7 +5,11 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 
 const employeeSchema = require("../models/schema/employee")
-const clientAppSchema = require("../models/schema/clientApp")
+const clientAppSchema = require("../models/schema/clientApp");
+const verifyJWT = require('../middlewares/verifyJWT');
+
+auth.use("/permission",verifyJWT, require("../routes/permission"))
+auth.use("/access_token", require("../routes/accessToken"))
 
 auth.post("/login", async (req, res)=>{
     const clientAppId = req.body.clientAppId

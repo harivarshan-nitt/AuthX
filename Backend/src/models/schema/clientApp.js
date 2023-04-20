@@ -21,11 +21,18 @@ const clientAppSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    scopes: {
+    scopes: [{
         type: String,
-        enum: ["NAME","EMAIL"],
+        enum: ["NAME", "EMAIL"],
         required: true,
-    },
+    }],
+    users: [{
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Employee',
+        },
+        auth_code: String
+    }],
 }, { timestamps: true });
 
 module.exports = mongoose.model('ClientApp', clientAppSchema);
