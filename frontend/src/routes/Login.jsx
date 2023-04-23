@@ -3,7 +3,7 @@ import Box from '../components/Box';
 import '../styles/Styles.css';
 import "../themes/main_theme"
 import Cookies from "universal-cookie"
-import { useNavigate, Navigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import Form from "../components/Forms";
 import {cool_50} from "../themes/main_theme"
@@ -13,15 +13,17 @@ const Register = ()=>{
     const cookies = new Cookies()
     const navigate = useNavigate()
     const jwt = cookies.get("jwt")
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const handleLogin = async (formData)=>{
-        console.log(formData);
+        const clientAppID = searchParams.get("clientAppID")
+        console.log({...formData, clientAppID: clientAppID});
         const req = {
             method: 'POST',
             headers: {'content-type': 'application/json'},
-            body: JSON.stringify(formData),
+            body: JSON.stringify({...formData, clientAppID: clientAppID}),
         };
-        const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/auth/login`, req);
+        const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/oauth/v2/login`, req);
         const response = await res.json();
 
         cookies.set("jwt", response.token)
@@ -42,7 +44,7 @@ const Register = ()=>{
 
     return (
         <Container center>
-            <Box width="600px">
+            <Box width="auto">
                 <Form fields={fields} onSubmit={(formData)=>handleLogin(formData)}/>
                 <div style={{
                     marginTop: "50px",

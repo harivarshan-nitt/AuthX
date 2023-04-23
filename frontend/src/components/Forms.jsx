@@ -16,14 +16,14 @@ const Form = (props) => {
 
   return (
     <form onSubmit={handleSubmit} style={{
-      width: "100%",
+      width: "40vw",
       marginTop: "30px"
   }}>
       {props.fields.map(field => (
         <div key={field.name}  style={{
-            width: "100%",
+            width: "40vw",
         }}>
-          <div htmlFor={field.name}  style={{
+          <div htmlFor={field.name} style={{
               width: "100%",
               color: cool_50,
               textAlign: "center"
@@ -36,7 +36,7 @@ const Form = (props) => {
           }}>
             <input type={field.type} name={field.name} id={field.name} placeholder={field.placeholder} value={formData[field.name] || ''} onChange={handleInputChange} style={{
               textAlign: "center",
-              width: "60%",
+              width: "80%",
               height: "25px",
               margin: "5px"
             }}/>

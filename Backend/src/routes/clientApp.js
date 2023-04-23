@@ -1,6 +1,6 @@
 const ClientAppRouter = require("express").Router();
 const crypto = require("crypto");
-const ClientApp = require("../../models/schema/clientApp");
+const ClientApp = require("../models/schema/clientApp");
 
 ClientAppRouter.post("/register", async (req, res) => {
   try {

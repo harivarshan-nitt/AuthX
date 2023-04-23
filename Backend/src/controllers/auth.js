@@ -1,67 +1,59 @@
-const jwtSecretKey = process.env.JWTSECRET
-
 const auth = require('express').Router();
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken');
 
 const employeeSchema = require("../models/schema/employee")
 const clientAppSchema = require("../models/schema/clientApp");
 const verifyJWT = require('../middlewares/verifyJWT');
+const { createJWT } = require('../helpers/jwt');
 
 auth.use("/permission",verifyJWT, require("../routes/permission"))
 auth.use("/access_token", require("../routes/accessToken"))
 
 auth.post("/login", async (req, res)=>{
-    const clientAppId = req.body.clientAppId
     const email = req.body.email
     const pass = req.body.password
-
-    console.log(req.body)
+    const clientAppId = req.body.clientAppID
 
     try{
         const userExists = await employeeSchema.findOne({
             email: email
         })
         if(userExists == null)
-            res.end({
-                status: 401,
-                response: "Email does not exist"
-            })   
+            res.status(401).json({
+                message: "Email does not exist"
+            })
         else{
+            console.log(clientAppId)
             const success = await bcrypt.compare(pass, userExists.password)
             if (success){
                 const data = {"id": userExists._id}
-                const token = jwt.sign(data, jwtSecretKey)
+                const token = createJWT(data)
                 if(clientAppId == null){
-                    res.end(JSON.stringify({
-                        status: 200,
+                    res.status(200).json({
                         redirect: process.env.FRONTEND_URL + "/profile",
-                        response: "Login Successful",
+                        message: "Login Successful",
                         token: token
-                    }))
+                    })
                 }
                 else{
-                    res.end(JSON.stringify({
-                        status: 200,
-                        redirect: process.env.FRONTEND_URL + "/authorize",
-                        response: "Login Successful",
+                    res.status(200).json({
+                        redirect: process.env.FRONTEND_URL + "/authorize?clientAppID=" + clientAppId,
+                        message: "Login Successful",
                         token: token
-                    }))                    
+                    })        
                 }
             }
             else{
-                res.end(JSON.stringify({
-                    status: 401,
-                    response: "Login Failed, Incorrect password",
-                }))
+                res.status(401).json({
+                    message: "Login Failed, Incorrect password",
+                })
             }
         }
     }
     catch(err){
         console.log(err)
-        res.end({
-            status: 500,
-            response: "Internal server error!"
+        res.status(500).json({
+            message: "Internal server error!"
         })
     }
 })
@@ -72,13 +64,12 @@ auth.post("/register", async (req, res)=>{
     const pass = req.body.password
     const repeat = req.body.repeat
     const salt = await bcrypt.genSalt(10)
-    console.log(req.body)
 
     if (pass!=repeat){
-        res.end(JSON.stringify({
+        res.status(400).json({
             status: 400,
-            response: "Password and Repeat Password does not match"
-        }))
+            message: "Password and Repeat Password does not match"
+        })
     }
     else{
         try{
@@ -86,10 +77,9 @@ auth.post("/register", async (req, res)=>{
                 email: email
             })
             if(userExists != null)
-                res.end(JSON.stringify({
-                    status: 409,
-                    response: "User Exists! Try logging in"
-                }))
+                res.status(401).json({
+                    message: "User Exists! Try logging in"
+                })
             else{
                 const hash = await bcrypt.hash(pass, salt)
                 const new_user = await employeeSchema.create({
@@ -97,19 +87,18 @@ auth.post("/register", async (req, res)=>{
                     password: hash,
                     name: name
                 })
-                res.end(JSON.stringify({
-                    status: 200,
-                    response: "Account Created! You can login now...",
+                res.status.json({
+                    message: "Account Created! You can login now...",
                     redirect: process.env.FRONTEND_URL + "/login"
-                }))
+                })
             }        
         }
         catch(err){
             console.log(err)
-            res.send(JSON.stringify({
+            res.status(500).json({
                 status: 500,
                 response: "Unexpected Server Error!"
-            }))
+            })
         }
     }   
     
