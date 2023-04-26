@@ -36,6 +36,22 @@ const Authorize = ()=>{
         GetPermissions()
     }, [jwt])
 
+    const AuthorizeApp = async ()=>{
+        const req = {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json',
+                "Authorization": `Bearer ${jwt}`,
+            },
+            body: JSON.stringify({clientAppId: clientAppID}),
+        };
+        const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/oauth/v2/permission`, req)
+        const response = await res.json()
+
+        console.log(response)
+
+    }
+
     return (
         <Container center>
             <Box width="40vw" height="300px" center>
@@ -71,7 +87,9 @@ const Authorize = ()=>{
                         backgroundColor: secondary,
                         color: cool_800,
                         cursor: "pointer"
-                    }}>
+                    }}
+                    onClick={()=>AuthorizeApp()}
+                    >
                         AUTHORIZE
                     </div>
                 </div>

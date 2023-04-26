@@ -1,9 +1,11 @@
 const router = require("express").Router();
+const Client = require("../models/schema/clientApp")
 const authorizeClientApp = require("../services/authorizeClientApp");
 // User authorizing an app 
 router.get("/", async (req, res)=>{
     try{
         console.log(req.query)
+        const employeeId = req.jwt_payload.id
         const clientAppId = req.query.clientAppID
         const client = await Client.findOne({ clientAppId: clientAppId })
         if (client == null) {
@@ -17,6 +19,7 @@ router.get("/", async (req, res)=>{
         })
     }
     catch(err){
+        console.log(err)
         res.status(500).json({
             message: "Internal Server Error!"   
         })
