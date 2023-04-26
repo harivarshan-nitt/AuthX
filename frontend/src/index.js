@@ -10,8 +10,14 @@ import Profile from './routes/Profile';
 import Login from './routes/Login';
 import reportWebVitals from './reportWebVitals';
 import Register from './routes/Register';
+import Logout from './routes/Logout';
+import Authorize from './routes/Authorize';
 
 const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Profile />
+  },
   {
     path: "/profile",
     element: <Profile />
@@ -23,6 +29,14 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <Register />
+  },
+  {
+    path: "/logout",
+    element: <Logout />
+  },
+  {
+    path: "/authorize",
+    element: <Authorize />
   }
 ])
 

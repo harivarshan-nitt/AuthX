@@ -21,7 +21,7 @@ const Register = ()=>{
             headers: {'content-type': 'application/json'},
             body: JSON.stringify(formData),
         };
-        const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/auth/register`, req);
+        const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/oauth/v2/register`, req);
         const response = await res.json();
 
         console.log(response)
@@ -44,7 +44,7 @@ const Register = ()=>{
 
     return (
         <Container center>
-            <Box width="600px">
+            <Box width="auto">
                 <Form fields={fields} onSubmit={(formData)=>handleRegister(formData)}/>
                 <div style={{
                     marginTop: "50px",

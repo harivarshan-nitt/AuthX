@@ -2,6 +2,26 @@ const router = require("express").Router();
 const Client = require("../models/schema/clientApp");
 const crypto = require("crypto");
 // User authorizing an app 
+router.get("/", async (req, res)=>{
+    try{
+        const clientAppId = req.headers.clientAppId
+        const client = await Client.findOne({ clientAppId: clientAppId })
+        if (client == null) {
+            return res.status(404).json({
+                message: "Client App does not exist"
+            })
+        }
+        return res.status(200).json({
+            permissions: client.scopes,
+            message: "success!"
+        })
+    }
+    catch(err){
+        res.status(500).json({
+            message: "Internam Server Error!"   
+        })
+    }
+})
 router.post("/", async(req, res) => {
     try {
         const clientAppId = req.body.clientAppId
