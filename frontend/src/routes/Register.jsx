@@ -23,10 +23,10 @@ const Register = ()=>{
         };
         const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/oauth/v2/register`, req);
         const response = await res.json();
-
+        
         console.log(response)
-
-        window.location.replace(response.redirect)
+        if(response.status == 200)
+            window.location.replace(response.redirect)
 
         return null
     }

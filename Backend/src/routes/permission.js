@@ -4,7 +4,8 @@ const crypto = require("crypto");
 // User authorizing an app 
 router.get("/", async (req, res)=>{
     try{
-        const clientAppId = req.headers.clientAppId
+        console.log(req.query)
+        const clientAppId = req.query.clientAppID
         const client = await Client.findOne({ clientAppId: clientAppId })
         if (client == null) {
             return res.status(404).json({
@@ -18,7 +19,7 @@ router.get("/", async (req, res)=>{
     }
     catch(err){
         res.status(500).json({
-            message: "Internam Server Error!"   
+            message: "Internal Server Error!"   
         })
     }
 })
