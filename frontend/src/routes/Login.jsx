@@ -4,7 +4,7 @@ import '../styles/Styles.css';
 import "../themes/main_theme"
 import Cookies from "universal-cookie"
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useEffect } from "react";
+import { useDebugValue, useEffect } from "react";
 import Form from "../components/Forms";
 import {cool_50} from "../themes/main_theme"
 
@@ -25,16 +25,32 @@ const Register = ()=>{
         };
         const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/oauth/v2/login`, req);
         const response = await res.json();
-
-        cookies.set("jwt", response.token)
-
-        window.location.replace(response.redirect)
+        if(res.status == 200){
+            cookies.set("jwt", response.token)
+            window.location.replace(response.redirect)
+        }
 
         return null
     }
+    useEffect(()=>{
+        if(jwt){
+            const clientAppID = searchParams.get("clientAppID")
+            if(!clientAppID)
+                navigate("/")
+            else
+                navigate(`/authorize?clientAppID=${clientAppID}`)
+        } 
+
+    }, [])
 
     useEffect(()=>{
-        if(jwt) navigate("/")
+        if(jwt){
+            const clientAppID = searchParams.get("clientAppID")
+            if(!clientAppID)
+                navigate("/")
+            else
+                navigate(`/authorize?clientAppID=${clientAppID}`)
+        } 
     }, [jwt, navigate])
 
     const fields = [

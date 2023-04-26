@@ -15,41 +15,44 @@ auth.post("/login", async (req, res)=>{
     const clientAppId = req.body.clientAppID
 
     try{
-        const userExists = await employeeSchema.findOne({
-            email: email
-        })
-        if(userExists == null)
-            res.status(401).json({
-                message: "Email does not exist"
-            })
+        if(!email || !pass) res.status(400).json({message: "Bad request"})
         else{
-            console.log(clientAppId)
-            const success = await bcrypt.compare(pass, userExists.password)
-            if (success){
-                const data = {"id": userExists._id}
-                const token = createJWT(data)
-                if(clientAppId == null){
-                    res.status(200).json({
-                        redirect: process.env.FRONTEND_URL + "/profile",
-                        message: "Login Successful",
-                        token: token
-                    })
+            const userExists = await employeeSchema.findOne({
+                email: email
+            })
+            if(userExists == null)
+                res.status(401).json({
+                    message: "Email does not exist"
+                })
+            else{
+                const success = await bcrypt.compare(pass, userExists.password)
+                if (success){
+                    const data = {"id": userExists._id}
+                    const token = createJWT(data)
+                    if(clientAppId == null){
+                        res.status(200).json({
+                            redirect: process.env.FRONTEND_URL + "/profile",
+                            message: "Login Successful",
+                            token: token
+                        })
+                    }
+                    else{
+                        res.status(200).json({
+                            redirect: process.env.FRONTEND_URL + "/authorize?clientAppID=" + clientAppId,
+                            message: "Login Successful",
+                            token: token
+                        })        
+                    }
                 }
                 else{
-                    res.status(200).json({
-                        redirect: process.env.FRONTEND_URL + "/authorize?clientAppID=" + clientAppId,
-                        message: "Login Successful",
-                        token: token
-                    })        
+                    res.status(401).json({
+                        message: "Login Failed, Incorrect password",
+                    })
                 }
-            }
-            else{
-                res.status(401).json({
-                    message: "Login Failed, Incorrect password",
-                })
             }
         }
     }
+
     catch(err){
         console.log(err)
         res.status(500).json({
@@ -64,11 +67,10 @@ auth.post("/register", async (req, res)=>{
     const pass = req.body.password
     const repeat = req.body.repeat
     const salt = await bcrypt.genSalt(10)
-
-    if (pass!=repeat){
+    if (pass!=repeat || (!email || !pass || !repeat || !name)){
         res.status(400).json({
             status: 400,
-            message: "Password and Repeat Password does not match"
+            message: "Bad request"
         })
     }
     else{

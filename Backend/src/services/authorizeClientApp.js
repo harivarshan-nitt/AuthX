@@ -10,18 +10,24 @@ const authorizeClientApp = async(req, res) => {
                 message: "Client App does not exist"
             })
         }
-        const auth_code = crypto.randomBytes(20).toString("hex")
-        client.users.push({
-            user: employeeId,
-            auth_code
-        })
-        await client.save()
-        return res.status(200).json({
-            message: "Client app authorized to access user data",
-            redirectUri: client.redirectUri,
-            scope: client.scopes,
-            auth_code
-        })
+        const user = client.users.find(user => user.user.toString() === employeeId)
+        if(user){
+            res.status(400).json({message: "User already authorized!"})
+        }
+        else{
+            const auth_code = crypto.randomBytes(20).toString("hex")
+            client.users.push({
+                user: employeeId,
+                auth_code
+            })
+            await client.save()
+            return res.status(200).json({
+                message: "Client app authorized to access user data",
+                redirectUri: client.redirectUri,
+                scope: client.scopes,
+                auth_code
+            })
+        }
     } catch (err) {
         console.log(err)
         return res.status(500).json({
