@@ -25,9 +25,11 @@ const Register = ()=>{
         };
         const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/oauth/v2/login`, req);
         const response = await res.json();
+        console.log(response)
         if(res.status == 200){
             cookies.set("jwt", response.token)
-            window.location.replace(response.redirect)
+            console.log(response)
+            window.open(response.redirect)
         }
 
         return null
@@ -35,6 +37,7 @@ const Register = ()=>{
     useEffect(()=>{
         if(jwt){
             const clientAppID = searchParams.get("clientAppID")
+            console.log(jwt)
             if(!clientAppID)
                 navigate("/")
             else
@@ -51,7 +54,7 @@ const Register = ()=>{
             else
                 navigate(`/authorize?clientAppID=${clientAppID}`)
         } 
-    }, [jwt, navigate])
+    }, [jwt])
 
     const fields = [
         { name: 'email', label: 'Email', type: 'email',  placeholder: "email..." },

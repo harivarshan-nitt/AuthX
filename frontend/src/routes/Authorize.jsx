@@ -2,7 +2,7 @@ import Container from "../components/Container"
 import '../styles/Styles.css';
 import "../themes/main_theme"
 import Cookies from "universal-cookie"
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { redirect, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Box from "../components/Box";
 import { cool_400, cool_50, cool_800, secondary } from "../themes/main_theme";
@@ -14,6 +14,7 @@ const Authorize = ()=>{
     const jwt = cookies.get("jwt")
     const [searchParams, setSearchParams] = useSearchParams();
     const [permissions, SetPermissions] = useState()
+    const [AlreadyAuthorized, SetAlreadyAuthorize] = useState(false)
     const clientAppID = searchParams.get('clientAppID')
 
     const GetPermissions = async()=>{
@@ -26,9 +27,13 @@ const Authorize = ()=>{
         };
         const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/oauth/v2/permission?clientAppID=${clientAppID}`, req);
         const response = await res.json();
-        console.log(response.permissions)
         if(res.status == 200)
             SetPermissions(response.permissions)
+        else if(res.status == 400){
+            console.log("REDIRECT")
+            SetAlreadyAuthorize(true)
+            window.location.replace(response.redirectUri+`/authorize?auth_code=${response.auth_code}`)
+        }
     }
 
     useEffect(()=>{
@@ -47,15 +52,17 @@ const Authorize = ()=>{
         };
         const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/oauth/v2/permission`, req)
         const response = await res.json()
-
-        console.log(response)
-
+        if(res.status == 200)
+        {
+            SetAlreadyAuthorize(true)
+            window.open(response.redirectUri+`/authorize?auth_code=${response.auth_code}`)
+        }
     }
 
     return (
         <Container center>
             <Box width="40vw" height="300px" center>
-                {permissions ? 
+                {!AlreadyAuthorized ? permissions ? 
                 <div>
                 <div className="text" style={{
                     color: cool_50
@@ -97,7 +104,11 @@ const Authorize = ()=>{
                 :
                 <div className="text" style={{
                     color: cool_50
-                }}>LOADING...</div>                
+                }}>LOADING...</div>   
+                :
+                <div className="text"style={{
+                    color: cool_50
+                }}>This app was already authorized</div>
                 }
             </Box>
         </Container>
