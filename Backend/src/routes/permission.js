@@ -13,10 +13,14 @@ router.get("/", async (req, res)=>{
                 message: "Client App does not exist"
             })
         }
+        const user = client.users.find(user => user.user.toString() === employeeId)
+        if(!user)
         return res.status(200).json({
             permissions: client.scopes,
             message: "success!"
         })
+        else
+        return res.status(400).json({message: "User already authorized app!", auth_code: user.auth_code, redirectUri: client.redirectUri})
     }
     catch(err){
         console.log(err)
